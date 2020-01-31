@@ -1,0 +1,27 @@
+.main {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+.preview {
+    width: 70%;
+    margin: 10px;
+    border-radius: 10px;
+}
+.submit {
+    margin: 10px;
+    width: 25%;
+}
+.file{
+    margin:10px;
+}
+.image {
+    border: 2px solid rgb(154, 154, 243);
+    margin: 10px;
+    border-radius: 4px;
+    transition: all 0.2s ease ;
+}
+.image:hover{
+    border: 2px solid rgb(99, 99, 241);
+    transition: all 0.2s ease ;
+}
