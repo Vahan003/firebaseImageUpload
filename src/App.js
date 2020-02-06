@@ -11,7 +11,7 @@ function FirebaseFiles() {
 
  
   useEffect(() => {
-    
+    console.log(">>>>....")
     firebase.db
       .collection("user")
       .get()
@@ -22,7 +22,7 @@ function FirebaseFiles() {
           const id = doc.id
           const path = doc.data().avatar
           avatar.getDownloadURL().then(url => {
-            images.push({url, path, id})
+            images.push({ id, url, path})
             setImages([...images])
           });
         })
@@ -45,11 +45,12 @@ function FirebaseFiles() {
     }
   };
  const deleteImg = (path, id)=> {
-    firebase.delete(path).then(d=>console.log(d))
+    firebase.delete(path).then(()=>{
     firebase.onDelete(id,"user")
     setImages([])
-    setId(id);
- }
+    setId(`${id}del`)
+    })
+  }
   
   const onSubmit1 = () => {
     if (fileName) {
@@ -61,7 +62,7 @@ function FirebaseFiles() {
           .then(d => {
             setWait("Submit");
             setImages([])
-            setId(d.id);
+            setId(`${d.id}set`);
           })
       );
     }
