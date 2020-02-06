@@ -25,6 +25,10 @@ class Firebase {
     const fileData = new Blob([file], {type : 'image/jpeg'})
     return await storeRef.put(fileData)
   }
+  delete = async (path) =>{
+   const storeRef = this.storeRef.child(path)
+   return await storeRef.delete()
+  }
 
   ref =  (id, collectionName) => {
     const createRef = new Ref(id, collectionName)

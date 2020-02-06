@@ -2,27 +2,33 @@ import React, { useState, useEffect } from "react";
 import firebase from "./firebase";
 import "./App.css";
 function FirebaseFiles() {
-  const [file, setFile] = useState();
+  const [file, setFile] = useState(null);
   const [fileTarget, setFileTarget] = useState();
   const [fileName, setFileName] = useState();
   const [images, setImages] = useState([]);
   const [wait, setWait] = useState("Submit");
-  const [id, setId] = useState();
+  const [id, setId] = useState(null);
 
+ 
   useEffect(() => {
+    
     firebase.db
       .collection("user")
       .get()
-      .then(data =>
-        data.forEach(doc => {
+      .then(data => {
+        setImages([])
+        return data.forEach(doc => {
           const avatar = firebase.storeRef.child(`${doc.data().avatar}`);
+          const id = doc.id
+          const path = doc.data().avatar
           avatar.getDownloadURL().then(url => {
-            images.push(url);
-            setImages([...images]);
+            images.push({url, path, id})
+            setImages([...images])
           });
         })
+      }
       );
-  }, []);
+  }, [id]);
 
   const showFile = e => {
     const reader = new FileReader();
@@ -34,17 +40,17 @@ function FirebaseFiles() {
         setFile(reader.result);
       };
     }
+    else{
+      setFile(null)
+    }
   };
-
-  const onSubmit = () => {
-    const avatar = firebase.storeRef.child(`user/avatar/${fileName}`);
-    let fileData = new Blob([fileTarget], { type: "image/jpeg" });
-    avatar
-      .put(fileData)
-      .then(snapshot =>
-        firebase.onCreate({ avatar: snapshot.metadata.fullPath }, "user")
-      );
-  };
+ const deleteImg = (path, id)=> {
+    firebase.delete(path).then(d=>console.log(d))
+    firebase.onDelete(id,"user")
+    setImages([])
+    setId(id);
+ }
+  
   const onSubmit1 = () => {
     if (fileName) {
       setWait("Wait...");
@@ -53,29 +59,35 @@ function FirebaseFiles() {
         firebase
           .onCreate({ avatar: data.metadata.fullPath }, "user")
           .then(d => {
-            setWait("Reload");
+            setWait("Submit");
+            setImages([])
             setId(d.id);
           })
       );
     }
   };
-  const reload = () => {
-    window.location.reload();
-  };
+  
 
   return (
     <div className="main">
+      <div className = "aside">
       <img className="preview" src={file}></img>
+       
       <input className="file" type="file" onChange={showFile}></input>
+      
       <button
         className="submit"
-        onClick={wait !== "Reload" ? onSubmit1 : reload}
+        onClick={wait !== "Wait..." && file !== null? onSubmit1 : ()=>{}}
       >
         {wait}
       </button>
-      <div>
+      </div>
+      <div className = "images" id = "scroll">
         {images.map(e => (
-          <img className="image" src={e}></img>
+           <div key = {e.id} className="image">
+          <img  src={e.url}></img>
+          <button onClick = {()=>deleteImg(e.path, e.id)} className="butt">Delete</button>
+          </div>
         ))}
       </div>
     </div>
